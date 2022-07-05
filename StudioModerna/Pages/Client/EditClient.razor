@@ -1,0 +1,104 @@
+﻿@page "/edit-client/{clientId?}"
+
+@inject NavigationManager NavigationManager
+@inject IEditClient EditClientUseCase
+@inject IGetClientById GetClientByIdUseCase
+
+@if (client != null)
+{
+    <h3>Client: @client.Name</h3>
+    <br />
+
+    <EditForm Model="@client" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="client.Name" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="oib">OIB</label>
+            <InputText id="oib" @bind-Value="client.OIB" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="client.Email" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <InputText id="phone" @bind-Value="client.Phone" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="adress">Adress</label>
+            <InputText id="adress" @bind-Value="client.Adress" class="form-control"></InputText>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+    </EditForm>
+}
+
+<br />
+<br />
+@code {
+    [Parameter]
+    public String? clientId { get; set; }
+    private Client? client;
+    private Client? working;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()//takoder asinc
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.clientId, out int iClientId))
+        {
+            this.working = GetClientByIdUseCase.Execute(iClientId);
+            if (working != null)
+            {
+                this.client = new Client
+                    {
+                        Id = working.Id,
+                        Name = working.Name,
+                        OIB = working.OIB,
+                        Email = working.Email,
+                        Phone = working.Phone,
+                        Adress = working.Adress
+                    };
+            }
+        }
+    }
+
+
+    private void HandleValidSubmit()
+    {
+        if (client != null)
+        {
+            Client submitClient = this.client;
+            EditClientUseCase.Execute(submitClient);
+        }
+        NavigationManager.NavigateTo("/clients");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/clients");
+    }
+}
+

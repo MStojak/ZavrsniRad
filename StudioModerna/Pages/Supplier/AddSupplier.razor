@@ -1,0 +1,77 @@
+﻿@page "/add-supplier"
+
+@inject NavigationManager NavigationManager
+@inject IAddSuplier AddSupplierUseCase
+
+<h3>Add new supplier</h3>
+<br />
+
+@if (supplier != null)
+{
+    <EditForm Model="@supplier" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="supplier.Name" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="oib">OIB</label>
+            <InputText id="oib" @bind-Value="supplier.OIB" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="mail">Mail</label>
+            <InputText id="mail" @bind-Value="supplier.Mail" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="mobile">Mobile Phone</label>
+            <InputText id="mobile" @bind-Value="supplier.MobilePhone" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <InputText id="location" @bind-Value="supplier.Location" class="form-control"></InputText>
+        </div>
+        <br />
+        <br />
+
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+    </EditForm>
+}
+
+<br />
+<br />
+@code {
+    private Supplier? supplier;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        supplier = new Supplier();
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (supplier != null)
+        {
+            AddSupplierUseCase.Execute(supplier);
+        }
+        NavigationManager.NavigateTo("/suppliers");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/suppliers");
+    }
+}

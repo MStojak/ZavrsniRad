@@ -1,0 +1,148 @@
+﻿@page "/edit-output-data/{outputDataId?}"
+
+@inject NavigationManager NavigationManager
+@inject IGetOutputDataById GetOutputDataByIdUseCase
+@inject IViewAllClients ViewClientUseCase
+@inject IEditOutputData EditOutputDataUseCase
+
+
+
+@if (outputData != null)
+{
+    <h3>Edit @outputData.BookName</h3>
+
+    <hr />
+    <br />
+    <EditForm Model="@outputData" OnValidSubmit="@HandleValidSubmit" class="align-content-between">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Book name</label>
+            <InputText id="name" @bind-Value="outputData.BookName" class="form-control"></InputText>
+        </div>
+        @if (clients != null)
+        {
+            <div class="form-group">
+                <label for="supplier-id">Client</label>
+                <select id="supplier-id" @bind="outputData.ClientId" class="form-control">
+                    <option selected></option>
+                    @foreach (var client in clients)
+                    {
+                        <option value="@client.Id">@client.Name</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="form-group">
+            <label for="dead-line">Deadline</label>
+            <InputDate id="dead-line" @bind-Value="outputData.Deadline" class="form-control"></InputDate>
+        </div>
+
+        <div class="form-group">
+            <label for="book-count">Number of books</label>
+            <InputNumber id="book-count" @bind-Value="outputData.BookCount" class="form-control"></InputNumber>
+        </div>
+
+
+        <div class="form-group">
+            <label for="package-count">Number of books in package</label>
+            <InputNumber id="package-count" @bind-Value="outputData.PackageCount" class="form-control"></InputNumber>
+        </div>
+        <br />
+        <div class="form-check">
+            <label for="certify-delivery-note">Need for certify delivery note?</label>
+            <InputCheckbox id="certify-delivery-note" @bind-Value="outputData.CertifyDeliveryNote"></InputCheckbox>
+        </div>
+        <div class="form-group form-check">
+            <label for="is-done">Is done?</label>
+            <InputCheckbox id="is-done" @bind-Value="outputData.IsDone"></InputCheckbox>
+        </div>
+        <br />
+        <hr />
+        <h5>Edit info that is unique to client?</h5>
+        <div class="form-group">
+            <label for="location">Location</label>
+            <InputText id="location" @bind-Value="outputData.Location" class="form-control"></InputText>
+        </div>
+        <div class="form-group">
+            <label for="contact">Contact</label>
+            <InputText id="contact" @bind-Value="outputData.Contact" class="form-control"></InputText>
+        </div>
+        <br />
+        <br />
+        <br />
+
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+        <br />
+        <br />
+    </EditForm>
+}
+else
+{
+    <h5>Nešto je pošlo po zlu.</h5>
+}
+<br />
+<br />
+@code {
+    [Parameter]
+    public string? outputDataId { get; set; }
+    private OutputData? outputData;
+    private OutputData? working;
+
+    private IEnumerable<Client>? clients;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        clients = ViewClientUseCase.Execute();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.outputDataId, out int iOutputDataId))
+        {
+            this.working = GetOutputDataByIdUseCase.Execute(iOutputDataId);
+            if (working != null)
+            {
+                this.outputData = new OutputData
+                    {
+                        Id = working.Id,
+                        ClientId = working.ClientId,
+                        BookName = working.BookName,
+                        Location = working.Location,
+                        Contact = working.Contact,
+                        BookCount = working.BookCount,
+                        Deadline = working.Deadline,
+                        PackageCount = working.PackageCount,
+                        CertifyDeliveryNote = working.CertifyDeliveryNote,
+                        IsDone = working.IsDone
+                    };
+            }
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (outputData != null)
+        {
+            OutputData submitJob = this.outputData;
+            EditOutputDataUseCase.Execute(submitJob);
+        }
+        NavigationManager.NavigateTo("/output-data");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/output-data");
+    }
+}

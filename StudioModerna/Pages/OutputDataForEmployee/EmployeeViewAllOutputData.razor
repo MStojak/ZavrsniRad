@@ -1,0 +1,168 @@
+﻿@page "/e/output-data-employee"
+
+@inject NavigationManager NavigationManager
+@inject IGetClientById GetClientByIdUseCase
+@inject IMakeBooleanToYesNo MakeBooleanToYesNoUseCase
+@inject IEditOutputData EditOutputDataUseCase
+
+@inject IGetAllOutputDataNotDone ViewAllOutputDataUseCase
+
+<h3>All exported items</h3>
+<hr />
+<br />
+
+@if (data != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Book name</th>
+                <th>Client</th>
+                <th>Number of books</th>
+                <th>Deadline</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in data)
+            {
+                <tr>
+                    <td @onclick="@(() => OnSelectOutputData(item))" style="cursor:pointer">@item.BookName</td>
+                    <td @onclick="@(() => OnSelectOutputData(item))" style="cursor:pointer">@GetClientByIdUseCase.Execute(item.ClientId)?.Name</td>
+                    <td @onclick="@(() => OnSelectOutputData(item))" style="cursor:pointer">@item.BookCount</td>
+                    <td @onclick="@(() => OnSelectOutputData(item))" style="cursor:pointer">@item.Deadline</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@if (selectedData != null)
+{
+    <div class="container px-4">
+        <div class="row gx-5">
+            <div class="col">
+
+                <br />
+
+                <div class="contaouter px-4">
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Book name</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.BookName</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Client name</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@GetClientByIdUseCase.Execute(@selectedData.ClientId)?.Name</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Contact</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.Contact</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Location</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.Location</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Book count</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.BookCount</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Books in one package</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.PackageCount</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Deadline</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.Deadline</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Need for certify delivery note</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@MakeBooleanToYesNoUseCase.getAnswer(selectedData.CertifyDeliveryNote)</div> <!--ovdje se moze napisat u ZI u da sam na ova nacout prikazivala brojeve sa dvije decimale-->
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <hr />
+
+            </div>
+            <div class="col-3">
+
+                <br />
+                <hr />
+                <div>
+                    <button type="button" @onclick="() => OnClickDone(selectedData)" class="btn btn-dark">Done</button>
+                </div>
+                <br />
+                <br />
+                <hr />
+
+            </div>
+        </div>
+    </div>
+}
+
+<br />
+<br />
+@code {
+    IEnumerable<OutputData>? data;
+
+    private OutputData? selectedData;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        this.data = ViewAllOutputDataUseCase.Execute();
+    }
+
+    private void OnClickAddOutputData()
+    {
+        NavigationManager.NavigateTo("/add-output-data");
+    }
+
+    private void OnSelectOutputData(OutputData data)
+    {
+        this.selectedData = data;
+    }
+
+    private void OnClickDone(OutputData item)
+    {
+        item.IsDone = true;
+        EditOutputDataUseCase.Execute(item);
+        this.selectedData = null;
+    }
+}

@@ -1,0 +1,146 @@
+﻿@page "/add-work-order"
+
+@inject IAddWorkOrder AddWorkOrderUseCase
+@inject NavigationManager NavigationManager
+@inject IViewAllClients ViewAllClientsUseCase
+@inject IViewAllAssignments ViewAllAssignmentsUseCase
+
+@if (workOrder != null)
+{
+    <div class="container px-4">
+        <div class="row gx-5">
+            <div class="col">
+
+                <h3>Add new item to import</h3>
+                <hr />
+                <br />
+
+                <EditForm Model="@workOrder" OnValidSubmit="@HandleValidSubmit" class="align-content-between">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="form-group">
+                        <label for="book-name">Book name</label>
+                        <InputText id="book-name" @bind-Value="workOrder.BookName" class="form-control"></InputText>
+                    </div>
+                    @if (clients != null)
+                    {
+                        <div class="form-group">
+                            <label for="client-id">Client</label>
+                            <select id="client-id" @bind="workOrder.ClientId" class="form-control">
+                                <option selected></option>
+                                @foreach (var client in clients)
+                                {
+                                    <option value="@client.Id">@client.Name</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    @if (assignments != null)
+                    {
+                        <div class="form-group">
+                            <label for="assignment-id">Assignment</label>
+                            <select id="assignment-id" @bind="workOrder.AssignmentId" class="form-control">
+                                <option selected></option>
+                                @foreach (var assignment in assignments)
+                                {
+                                    <option value="@assignment.Id">@assignment.Description</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    <div class="form-group">
+                        <label for="num-books">Number of books</label>
+                        <InputNumber id="num-books" @bind-Value="workOrder.TotalNumberOfBooks" class="form-control"></InputNumber>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="num-package">Number of books in onnne package</label>
+                        <InputNumber id="num-package" @bind-Value="workOrder.NumberOfBooksInPackage" class="form-control"></InputNumber>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="delivery-date">Delivery date</label>
+                        <InputDate id="delivery-date" @bind-Value="workOrder.DeliveryDate" class="form-control"></InputDate>
+                    </div>
+                    <br />
+                    <br />
+
+                    <div>
+                        <button type="submit" class="btn btn-dark">Save</button>
+                    </div>
+                    <br />
+                    <br />
+                    <div>
+                        <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+                    </div>
+                </EditForm>
+            </div>
+            <div class="col-5">
+                <br />
+                <br />
+                <br />
+
+                <div>
+                    <button type="submit" class="btn btn-dark">Save</button>
+                </div>
+                <br />
+                <br />
+                <div>
+                    <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+                </div>
+                <br />
+                <br />
+                <div>
+                    <button type="submit" class="btn btn-dark" @onclick="OnClickAddClient">Add client</button>
+                </div>
+                <br />
+                <br />
+                <div>
+                    <button type="button" class="btn btn-dark" @onclick="OnClickAddAssignment">Add assignment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<br />
+<br />
+
+@code {
+    private WorkOrder? workOrder;
+    private IEnumerable<Client>? clients;
+    private IEnumerable<Assignment>? assignments;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        workOrder = new WorkOrder();
+        clients = ViewAllClientsUseCase.Execute();
+        assignments = ViewAllAssignmentsUseCase.Execute();
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (workOrder != null)
+        {
+            AddWorkOrderUseCase.Execute(workOrder);
+        }
+        NavigationManager.NavigateTo("/work-order");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/work-order");
+    }
+
+    private void OnClickAddAssignment()
+    {
+        NavigationManager.NavigateTo("/add-work-order/add-assignment");
+    }
+
+    private void OnClickAddClient()
+    {
+        NavigationManager.NavigateTo("/add-work-order/add-client");
+    }
+}

@@ -1,0 +1,79 @@
+﻿@page "/suppliers"
+
+@inject NavigationManager NavigationManager
+@inject IEditSupplier EditSupplierUseCase
+@inject IViewAllSuppliers ViewSuppliersUseCase
+@inject IDeleteSupplier DeleteSupplierUseCase
+
+<h3>Suppliers</h3>
+<br />
+
+@if (suppliers != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>OIB</th>
+                <th>Mail</th>
+                <th>Mobile Phone</th>
+                <th>Location</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in suppliers)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.OIB</td>
+                    <td>@item.Mail</td>
+                    <td>@item.MobilePhone</td>
+                    <td>@item.Location</td>
+                    <td><button type="button" @onclick="() => EditSupplierMethod(item)" class="btn btn-link">Edit</button></td>
+                    <td><button type="button" @onclick="() => DeleteSupplierMethod(item.Id)" class="btn btn-link">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<br />
+<br />
+<div>
+    <button type="button" @onclick="OnClickAddCategory" class="btn btn-dark">Add Supplier</button>
+</div>
+<br />
+<br />
+@code {
+    private List<Supplier>? suppliers;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadCategories();
+    }
+
+    private void OnClickAddCategory()
+    {
+        NavigationManager.NavigateTo("/add-supplier");
+    }
+
+    private void EditSupplierMethod(Supplier supplier)
+    {
+        NavigationManager.NavigateTo($"/edit-supplier/{supplier.Id}");
+    }
+
+    private void DeleteSupplierMethod(int supplierId)
+    {
+        DeleteSupplierUseCase.Execute(supplierId);
+        LoadCategories();
+    }
+
+    private void LoadCategories()
+    {
+        suppliers = ViewSuppliersUseCase.Execute()?.ToList();
+    }
+}

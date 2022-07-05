@@ -1,0 +1,150 @@
+﻿@page "/edit-input-data/{inputDataId?}"
+
+@inject NavigationManager NavigationManager
+@inject IGetInputDataById GetInputDataByIdUseCase
+@inject IViewAllSuppliers ViewSupplierUseCase
+@inject IEditInputData EditInputDataUseCase
+
+
+
+@if (inputData != null)
+{
+    <h3>Edit @inputData.NameOfAGood</h3>
+
+    <hr />
+    <br />
+
+    <EditForm Model="@inputData" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="inputData.NameOfAGood" class="form-control"></InputText>
+        </div>
+        @if (suppliers != null)
+        {
+            <div class="form-group">
+                <label for="supplier-id">Supplier</label>
+                <select id="supplier-id" @bind="inputData.SupplierId" class="form-control">
+                    <option selected></option>
+                    @foreach (var sup in suppliers)
+                    {
+                        <option value="@sup.Id">@sup.Name</option>
+                    }
+                </select>
+            </div>
+        }
+        <div class="form-group">
+            <label for="location">Type</label>
+            <InputText id="location" @bind-Value="inputData.TypeOfAGood" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Number of peices</label>
+            <InputNumber id="description" @bind-Value="inputData.CountOfPeices" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Kuna's per peice</label>
+            <InputNumber id="description" @bind-Value="inputData.KunaPerPeice" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Euro's per peice</label>
+            <InputNumber id="description" @bind-Value="inputData.EuroPerPeice" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Total expence[kn]</label>
+            <InputNumber id="description" @bind-Value="inputData.TotalExpenceInKunas" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Total expence[]</label>
+            <InputNumber id="description" @bind-Value="inputData.TotalExpenceInEuros" class="form-control"></InputNumber>
+        </div>
+
+        <div class="form-group">
+            <label for="deadline-del">Deadline for delivery</label>
+            <InputDate id="deadline-del" @bind-Value="inputData.DeliveryDeadline" class="form-control"></InputDate>
+        </div>
+
+        <div class="form-group">
+            <label for="deadline-pay">Deadline for paying</label>
+            <InputDate id="deadline-pay" @bind-Value="inputData.PayingDeadline" class="form-control"></InputDate>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+    </EditForm>
+}
+else
+{
+    <h2>Nešto je pošlo po zlu.</h2>
+}
+<br />
+<br />
+@code {
+    [Parameter]
+    public string? inputDataId { get; set; }
+    private InputData? inputData;
+    private InputData? working;
+
+    private IEnumerable<Supplier>? suppliers;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        suppliers = ViewSupplierUseCase.Execute();
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.inputDataId, out int iInputDataId))
+        {
+            this.working = GetInputDataByIdUseCase.Execute(iInputDataId);
+            if (working != null)
+            {
+                this.inputData = new InputData
+                    {
+                        Id = working.Id,
+                        NameOfAGood = working.NameOfAGood,
+                        SupplierId = working.SupplierId,
+                        TypeOfAGood = working.TypeOfAGood,
+                        CountOfPeices = working.CountOfPeices,
+                        KunaPerPeice = working.KunaPerPeice,
+                        EuroPerPeice = working.EuroPerPeice,
+                        TotalExpenceInKunas = working.TotalExpenceInKunas,
+                        TotalExpenceInEuros = working.TotalExpenceInEuros,
+                        IsPaid = working.IsPaid,
+                        IsDelivered = working.IsDelivered
+                    };
+            }
+        }
+    }
+
+    private void HandleValidSubmit()
+    {
+        if (inputData != null)
+        {
+            InputData submitJob = this.inputData;
+            EditInputDataUseCase.Execute(submitJob);
+        }
+        NavigationManager.NavigateTo("/input-data");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/input-data");
+    }
+}

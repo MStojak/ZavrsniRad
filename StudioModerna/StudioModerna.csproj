@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controls\**" />
+    <Compile Remove="Pages\Category\**" />
+    <Compile Remove="Pages\Job\**" />
+    <Compile Remove="Pages\ZaposlenikConsole\**" />
+    <Content Remove="Controls\**" />
+    <Content Remove="Pages\Category\**" />
+    <Content Remove="Pages\Job\**" />
+    <Content Remove="Pages\ZaposlenikConsole\**" />
+    <EmbeddedResource Remove="Controls\**" />
+    <EmbeddedResource Remove="Pages\Category\**" />
+    <EmbeddedResource Remove="Pages\Job\**" />
+    <EmbeddedResource Remove="Pages\ZaposlenikConsole\**" />
+    <None Remove="Controls\**" />
+    <None Remove="Pages\Category\**" />
+    <None Remove="Pages\Job\**" />
+    <None Remove="Pages\ZaposlenikConsole\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.5" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreBusiness\CoreBusiness.csproj" />
+    <ProjectReference Include="..\Plugins.Data.InMemory\Plugins.Data.InMemory.csproj" />
+    <ProjectReference Include="..\Plugins.Data.SQL\Plugins.Data.SQL.csproj" />
+    <ProjectReference Include="..\UseCases\UseCases.csproj" />
+  </ItemGroup>
+
+</Project>

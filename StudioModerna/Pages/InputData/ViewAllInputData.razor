@@ -1,0 +1,228 @@
+﻿@page "/input-data"
+
+@inject NavigationManager NavigationManager
+@inject IGetSupplierById GetSupplierByIdUseCase
+@inject IMakeBooleanToYesNo MakeBooleanToYesNoUseCase
+@inject IEditInputData EditInputDataUseCase
+
+@inject IViewAllInputData ViewAllInputDataUseCase
+
+<h3>All imported items</h3>
+<hr />
+<br />
+
+@if (data != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Supplier</th>
+                <th>Type</th>
+                <th>Delivered</th>
+                <th>Paid</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in data)
+            {
+                <tr>
+                    <td @onclick="@(() => OnSelectInputData(item))" style="cursor:pointer">@item.NameOfAGood</td>
+                    <td @onclick="@(() => OnSelectInputData(item))" style="cursor:pointer">@GetSupplierByIdUseCase.Execute(item.SupplierId)?.Name</td>
+                    <td @onclick="@(() => OnSelectInputData(item))" style="cursor:pointer">@item.TypeOfAGood</td>
+                    <td @onclick="@(() => OnSelectMakeDataDelivered(item))" style="cursor:pointer">@MakeBooleanToYesNoUseCase.getAnswer(item.IsDelivered)</td>
+                    <td @onclick="@(() => OnSelectMakeDataPaid(item))" style="cursor:pointer">@MakeBooleanToYesNoUseCase.getAnswer(item.IsPaid)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedData != null)
+{
+    <div class="container px-4">
+        <div class="row gx-5">
+            <div class="col">
+                <br />
+
+                <div class="container px-4">
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Name</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.NameOfAGood</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Type</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.TypeOfAGood</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Count</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.CountOfPeices</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Supplier</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@GetSupplierByIdUseCase.Execute(selectedData.SupplierId)?.Name</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Kuna per peice</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.KunaPerPeice.ToString("0.00") kn/peice</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Kuna per peice</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.EuroPerPeice.ToString("0.00") €/peice</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Expence in kuna</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.TotalExpenceInKunas.ToString("0.00") kn</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Expence in euro</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.TotalExpenceInEuros.ToString("0.00") €</div> <!--ovdje se moze napisat u ZI u da sam na ova nacin prikazivala brojeve sa dvije decimale-->
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Is delivered</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@MakeBooleanToYesNoUseCase.getAnswer(selectedData.IsDelivered)</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Is paid</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@MakeBooleanToYesNoUseCase.getAnswer(selectedData.IsPaid)</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Deadline for delivering</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.DeliveryDeadline</div>
+                        </div>
+                    </div>
+                    <div class="row gx-5">
+                        <div class="col-3">
+                            <div class="p-3 border bg-light">Deadline for paying</div>
+                        </div>
+                        <div class="col">
+                            <div class="p-3 border bg-light">@selectedData.PayingDeadline</div>
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <hr />
+
+
+
+            </div>
+            <div class="col-3">
+                <br />
+                <hr />
+                <div>
+                    <button type="button" @onclick="() => OnClickEdit(selectedData.Id)" class="btn btn-dark float-xl-start">Edit</button>
+                </div>
+                <div>
+                    <button type="button" @onclick="OnClickClose" class="btn btn-dark float-xl-end">Ok</button>
+                </div>
+                <br />
+                <br />
+                <hr />
+            </div>
+        </div>
+    </div>
+}
+else
+{
+
+    <br />
+    <div>
+        <button type="button" @onclick="OnClickAddInputData" class="btn btn-dark">Add Job to import</button>
+    </div>
+}
+
+<br />
+<br />
+@code {
+    IEnumerable<InputData>? data;
+
+    private InputData? selectedData;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        this.data = ViewAllInputDataUseCase.Execute();
+    }
+
+    private void OnClickAddInputData()
+    {
+        NavigationManager.NavigateTo("/add-input-data");
+    }
+
+    private void OnClickEdit(int id)
+    {
+        NavigationManager.NavigateTo($"/edit-input-data/{id}");
+    }
+
+    private void OnSelectInputData(InputData data)
+    {
+        this.selectedData = data;
+    }
+
+    private void OnClickClose()
+    {
+        this.selectedData = null;
+    }
+
+    private void OnSelectMakeDataDelivered(InputData item)
+    {
+        item.IsDelivered = !item.IsDelivered;
+        EditInputDataUseCase.Execute(item);
+    }
+
+    private void OnSelectMakeDataPaid(InputData item)
+    {
+        item.IsPaid = !item.IsPaid;
+        EditInputDataUseCase.Execute(item);
+    }
+}

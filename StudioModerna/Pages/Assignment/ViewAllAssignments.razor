@@ -1,0 +1,180 @@
+﻿@page "/assignments"
+
+@inject NavigationManager NavigationManager
+@inject IEditAssignment EditAssignmentUseCase
+@inject IViewAllAssignments ViewAssignmentsUseCase
+@inject IDeleteAssignment DeleteAssignmentUseCase
+
+<h3>Assignments</h3>
+<br />
+
+@if (assignments != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Format</th>
+                <th>Paper type</th>
+                <th>Book cover</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in assignments)
+            {
+                <tr>
+                    <td @onclick="@(() => OnClickSelectAssignment(item))" style="cursor:pointer">@item.Description</td>
+                    <td @onclick="@(() => OnClickSelectAssignment(item))" style="cursor:pointer">@item.Format</td>
+                    <td @onclick="@(() => OnClickSelectAssignment(item))" style="cursor:pointer">@item.PaperType</td>
+                    <td @onclick="@(() => OnClickSelectAssignment(item))" style="cursor:pointer">@item.BookCover</td>
+                    <td><button type="button" @onclick="() => EditAssignmentMethod(item)" class="btn btn-link">Edit</button></td>
+                    <td><button type="button" @onclick="() => DeleteAssignmentMethod(item.Id)" class="btn btn-link">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (selectedDataAssignment != null)
+{
+    <br />
+    <hr />
+    <br />
+    <h5> Assignment: @selectedDataAssignment.Description</h5>
+    <br />
+
+    <div class="contaouter px-4">
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Format</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.Format</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Paper type</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.PaperType</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Machine type</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.MachineType</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Binding type</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.BindingType</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Additional</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.BookAdditional</div>
+            </div>
+        </div>
+        <hr />
+        <h6>Book cover information:</h6>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Color</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.BookCover</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Paper type</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.BookCoverPaperType</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Plastic type</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.BookCoverPlasticType</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Additional</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@selectedDataAssignment.BookCoverAdditional</div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <br />
+    <hr />
+    <div>
+        <button type="button" class="btn btn-dark" @onclick="OnClickCloseAssignment">Ok</button>
+    </div>
+}
+else
+{
+    <br />
+    <div>
+        <button type="button" @onclick="OnClickAddCategory" class="btn btn-dark">Add Assignment</button>
+    </div>
+}
+<br />
+<br />
+@code {
+    private List<Assignment>? assignments;
+    private Assignment? selectedDataAssignment;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadCategories();
+    }
+
+    private void OnClickAddCategory()
+    {
+        NavigationManager.NavigateTo("/add-assignment");
+    }
+
+    private void EditAssignmentMethod(Assignment assignment)
+    {
+        NavigationManager.NavigateTo($"/edit-assignment/{assignment.Id}");
+    }
+
+    private void DeleteAssignmentMethod(int assignmentId)
+    {
+        DeleteAssignmentUseCase.Execute(assignmentId);
+        LoadCategories();
+    }
+
+    private void LoadCategories()
+    {
+        assignments = ViewAssignmentsUseCase.Execute()?.ToList();
+    }
+
+    private void OnClickSelectAssignment(Assignment assignment)
+    {
+        this.selectedDataAssignment = assignment;
+    }
+    private void OnClickCloseAssignment()
+    {
+        this.selectedDataAssignment = null;
+    }
+}

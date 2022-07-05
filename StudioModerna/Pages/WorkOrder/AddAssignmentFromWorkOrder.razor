@@ -1,0 +1,109 @@
+﻿@page "/work-order/add-assignment"
+
+@inject NavigationManager NavigationManager
+@inject IAddAssignment AddAssignmentUseCase
+
+<h3>Add new assignment</h3>
+<br />
+
+@if (assignment != null)
+{
+    <EditForm Model="@assignment" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <InputText id="description" @bind-Value="assignment.Description" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="format">Format</label>
+            <InputText id="format" @bind-Value="assignment.Format" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="paper-type">Paper type</label>
+            <InputText id="paper-type" @bind-Value="assignment.PaperType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="machine-type">Machine type</label>
+            <InputText id="machine-type" @bind-Value="assignment.MachineType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="binding-type">Binding type</label>
+            <InputText id="binding-type" @bind-Value="assignment.BindingType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-additional">Additional</label>
+            <InputText id="book-additional" @bind-Value="assignment.BookAdditional" class="form-control"></InputText>
+        </div>
+
+        <br />
+        <h4>Book cover</h4>
+        <hr />
+
+        <div class="form-group">
+            <label for="book-cover">Type of press</label>
+            <InputText id="book-cover" @bind-Value="assignment.BookCover" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-cover-paper-type">Paper type</label>
+            <InputText id="book-cover-paper-type" @bind-Value="assignment.BookCoverPaperType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-cover-plastic-type">Type of plastic</label>
+            <InputText id="book-cover-plastic-type" @bind-Value="assignment.BookCoverPlasticType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-cover-additional">Additional</label>
+            <InputText id="book-cover-additional" @bind-Value="assignment.BookCoverAdditional" class="form-control"></InputText>
+        </div>
+        <br />
+        <br />
+        <hr />
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+        <br />
+        <br />
+
+    </EditForm>
+}
+<br />
+<br />
+
+@code {
+    private Assignment? assignment;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        assignment = new Assignment();
+    }
+
+    private void HandleValidSubmit()
+    {
+        if(assignment != null)
+        {
+            AddAssignmentUseCase.Execute(assignment);
+        }
+        NavigationManager.NavigateTo("/work-order");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/work-order");
+    }
+}

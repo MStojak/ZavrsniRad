@@ -1,0 +1,125 @@
+﻿@page "/delete-output-data/{selectedId?}"
+
+@inject IGetOutputDataById GetOutputDataByIdUseCase
+@inject IMakeBooleanToYesNo MakeBooleanToYesNoUseCase
+@inject IGetClientById GetClientByIdUseCase
+@inject IDeleteOutputData DeleteOutputDataUseCase
+@inject NavigationManager NavigationManager
+
+<h3>DeleteOutputData</h3>
+
+@if (outputData != null)
+{
+    <h3>Still want delete this data?</h3>
+    <br />
+
+    <div class="contaouter px-4">
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Book name</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@outputData.BookName</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Client name</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@GetClientByIdUseCase.Execute(@outputData.ClientId)?.Name</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Contact</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@outputData.Contact</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Location</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@outputData.Location</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Book count</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@outputData.BookCount</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Books in one package</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@outputData.PackageCount</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Deadline</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@outputData.Deadline</div>
+            </div>
+        </div>
+        <div class="row gx-5">
+            <div class="col-3">
+                <div class="p-3 border bg-light">Need for certify delivery note</div>
+            </div>
+            <div class="col">
+                <div class="p-3 border bg-light">@MakeBooleanToYesNoUseCase.getAnswer(outputData.CertifyDeliveryNote)</div> <!--ovdje se moze napisat u ZI u da sam na ova nacout prikazivala brojeve sa dvije decimale-->
+            </div>
+        </div>
+    </div>
+
+    <br />
+    <hr />
+    <div>
+        <button type="button" @onclick="OnClickDelete" class="btn btn-dark">Delete</button>
+    </div>
+    <br />
+    <br />
+    <div>
+        <button type="button" @onclick="OnClickCancel" class="btn btn-dark">Cancel</button>
+    </div>
+}
+<br />
+<br />
+@code {
+    [Parameter]
+    public string? selectedId { get; set; }
+
+    private OutputData? outputData;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (int.TryParse(this.selectedId, out int iInputDataId))
+        {
+            this.outputData = GetOutputDataByIdUseCase.Execute(iInputDataId);
+        }
+    }
+
+    private void OnClickDelete()
+    {
+        if (outputData != null)
+        {
+            DeleteOutputDataUseCase.Execute(outputData.Id);
+        }
+        NavigationManager.NavigateTo("/output-data");
+    }
+
+    private void OnClickCancel()
+    {
+        NavigationManager.NavigateTo("/output-data");
+    }
+
+}

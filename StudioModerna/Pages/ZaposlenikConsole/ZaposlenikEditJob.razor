@@ -1,0 +1,107 @@
+﻿@page "/see-job/{jobId?}"
+
+@inject NavigationManager NavigationManager
+@inject IGetJobById GetJobByIdUseCase
+@inject IGetCategoryById GetCategoryByIdUseCase
+@inject IGetSupplierById GetSupplierByIdUseCase
+@inject IEditJob EditJobUseCase
+@inject IGetJobById GetJobByIdUseCase
+
+@if (job != null)
+{
+    <h3>@job.Name</h3>
+    <br/>
+    <EditForm Model="@job" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="form-group" style="text-align:center">
+            <value for="category-id" >Category: @categoryName</value>
+        </div>
+
+        <div class="form-group" style="text-align:center">
+            <label for="supplier">Supplier: @supplierName</label>
+        </div>
+
+        <div class="form-group" style="text-align:center">
+            <label for="deadline">Deadline: @job.Deadline</label>
+        </div>
+
+        <div class="form-group" style="text-align:center">
+            <label for="location">Location: @job.Location</label>
+        </div>
+
+        <div class="form-group" style="text-align:center">
+            <label for="description">Description: @job.Description</label>
+        </div>
+
+        <div class="form-group form-check" style="text-align:center">
+            <label for="is-taken">Is taken</label>
+            <InputCheckbox id="is-taken" @bind-Value="job.IsTaken" style="align-self:end"></InputCheckbox>
+        </div>
+        <div class="form-group form-check" style="text-align:center">
+            <label for="is-done">Is done</label>
+            <InputCheckbox id="is-done" @bind-Value="job.IsDone" style="accent-color align-self:end"></InputCheckbox>
+        </div>
+
+        <!--ovo treba masno provjeriti-->
+        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="button" class="btn btn-primary" @onclick="OnCancel">Cancel</button>
+    </EditForm>
+} else
+{
+    
+}
+
+@code {
+    [Parameter]
+    public String jobId { get; set; }
+    private Job job;
+    private Job working;
+
+    private string categoryName;
+    private string supplierName;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override async void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.jobId, out int iJobId))
+        {
+            this.working = GetJobByIdUseCase.Execute(iJobId);
+            this.job = new Job
+            {
+                Id = working.Id,
+                CategoryId = working.CategoryId,
+                Name = working.Name,
+                SupplierId = working.SupplierId,
+                Deadline = working.Deadline,
+                Location = working.Location,
+                Description = working.Description,
+                IsTaken = working.IsTaken,
+                IsDone = working.IsDone
+            }; 
+
+            categoryName = GetCategoryByIdUseCase.Execute(job.CategoryId)?.Name;
+            supplierName = GetSupplierByIdUseCase.Execute(job.SupplierId)?.Name;
+        }
+    }
+
+
+    private void HandleValidSubmit()
+    {
+        Job submitJob = this.job;
+        EditJobUseCase.Execute(submitJob);
+        NavigationManager.NavigateTo("/all-jobs");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/all-jobs");
+    }
+}

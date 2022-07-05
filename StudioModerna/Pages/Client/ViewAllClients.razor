@@ -1,0 +1,79 @@
+﻿@page "/clients"
+
+@inject NavigationManager NavigationManager
+@inject IEditClient EditClientUseCase
+@inject IViewAllClients ViewClientsUseCase
+@inject IDeleteClient DeleteClientUseCase
+
+<h3>Clients</h3>
+<br />
+
+@if (clients != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>OIB</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Email</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in clients)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.OIB</td>
+                    <td>@item.Adress</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Email</td>
+                    <td><button type="button" @onclick="() => EditClientMethod(item)" class="btn btn-link">Edit</button></td>
+                    <td><button type="button" @onclick="() => DeleteClientMethod(item.Id)" class="btn btn-link">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<br />
+<div>
+    <button type="button" @onclick="OnClickAddCategory" class="btn btn-dark">Add Client</button>
+</div>
+
+<br />
+<br />
+@code {
+    private List<Client>? clients;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadCategories();
+    }
+
+    private void OnClickAddCategory()
+    {
+        NavigationManager.NavigateTo("/add-client");
+    }
+
+    private void EditClientMethod(Client client)
+    {
+        NavigationManager.NavigateTo($"/edit-client/{client.Id}");
+    }
+
+    private void DeleteClientMethod(int clientId)
+    {
+        DeleteClientUseCase.Execute(clientId);
+        LoadCategories();
+    }
+
+    private void LoadCategories()
+    {
+        clients = ViewClientsUseCase.Execute()?.ToList();
+    }
+}

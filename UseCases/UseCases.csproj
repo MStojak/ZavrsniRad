@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Old\**" />
+    <EmbeddedResource Remove="Old\**" />
+    <None Remove="Old\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="DataPluginInterfaces\ICategoryRepository.cs" />
+    <Compile Remove="DataPluginInterfaces\IJobRepository.cs" />
+    <Compile Remove="Interfaces\IAddCategory.cs" />
+    <Compile Remove="Interfaces\IAddJob.cs" />
+    <Compile Remove="Interfaces\IDeleteCategory.cs" />
+    <Compile Remove="Interfaces\IDeleteJob.cs" />
+    <Compile Remove="Interfaces\IEditCategory.cs" />
+    <Compile Remove="Interfaces\IEditJob.cs" />
+    <Compile Remove="Interfaces\IGetCategoriesMinimalId.cs" />
+    <Compile Remove="Interfaces\IGetCategoryById.cs" />
+    <Compile Remove="Interfaces\IGetJobById.cs" />
+    <Compile Remove="Interfaces\IGetJobsBycategoryIdAndIsTaken.cs" />
+    <Compile Remove="Interfaces\IViewCategories.cs" />
+    <Compile Remove="Interfaces\IViewJob.cs" />
+    <Compile Remove="Interfaces\IViewJobsByCategoryId.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreBusiness\CoreBusiness.csproj" />
+  </ItemGroup>
+
+</Project>

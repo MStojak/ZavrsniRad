@@ -1,0 +1,74 @@
+﻿@page "/add-work-order/add-client"
+@inject NavigationManager NavigationManager
+@inject IAddClient AddClientUseCase
+
+<h3>Add new client</h3>
+<br />
+
+@if (client != null)
+{
+    <EditForm Model="@client" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="client.Name" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="oib">OIB</label>
+            <InputText id="oib" @bind-Value="client.OIB" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText id="email" @bind-Value="client.Email" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="phone">Phone</label>
+            <InputText id="phone" @bind-Value="client.Phone" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="adress">Adress</label>
+            <InputText id="adress" @bind-Value="client.Adress" class="form-control"></InputText>
+        </div>
+
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+    </EditForm>
+}
+<br />
+<br />
+
+@code {
+    private Client? client;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        client = new Client();
+    }
+
+    private void HandleValidSubmit()
+    {
+        if(client != null)
+        {
+            AddClientUseCase.Execute(client);
+        }
+        NavigationManager.NavigateTo("/add-work-order");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/add-work-order");
+    }
+}

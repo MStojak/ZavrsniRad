@@ -1,0 +1,87 @@
+﻿@page "/jobs"
+
+@inject NavigationManager NavigationManager
+@inject IGetCategoryById GetCategoryByIdUseCase
+@inject IGetSupplierById GetSupplierByIdUseCase
+@inject IViewJob ViewTasksUseCase
+@inject IDeleteJob DeleteJobUseCase
+
+
+<h3>Manage Jobs</h3>
+<br/>
+
+
+@if (jobs != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Name</th>
+                <th>Supplier</th>
+                <th>Deadline</th>
+                <th>Location</th>
+                <th>Description</th>
+                <th>Is taken</th>
+                <th>Is done</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+    
+        <tbody>
+            @foreach (var job in jobs)
+            {
+                <tr>
+                    <td>@GetCategoryByIdUseCase.Execute(job.CategoryId)?.Name</td>
+                    <td>@job.Name</td>
+                    <td>@GetSupplierByIdUseCase.Execute(job.SupplierId)?.Name</td>
+                    <td>@job.Deadline</td>
+                    <td>@job.Location</td>
+                    <td>@job.Description</td>
+                    <td>@job.IsTaken</td>
+                    <td>@job.IsDone</td>
+                    <!--U ovome ce se razlikovati admin, Vlasnik od Zaposlenika-->
+                    <td><button type="button" @onclick="() => EditJobMethod(job.Id)" class="btn btn-link">Edit</button></td>
+                    <td><button type="button" @onclick="() => DeleteJobMethod(job.Id)" class="btn btn-link">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<br/>
+
+<!--U ovome ce se razlikovati admin, Vlasnik od Zaposlenika-->
+<button type="button" @onclick="OnClickAddJob" class="btn btn-dark">Add Job</button>
+
+@code {
+    private IEnumerable<Job>? jobs;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        LoadJobs();
+    } 
+
+    private void OnClickAddJob()
+    {
+        NavigationManager.NavigateTo("/add-job");
+    }
+    
+    private void EditJobMethod(int jobId)
+    {
+        NavigationManager.NavigateTo($"/edit-job/{jobId}");
+    }
+
+    private void DeleteJobMethod(int jobId)
+    {
+        DeleteJobUseCase.Execute(jobId);
+        LoadJobs();
+    }
+
+    private void LoadJobs()
+    {
+        jobs = ViewTasksUseCase.Execute();
+    }
+}

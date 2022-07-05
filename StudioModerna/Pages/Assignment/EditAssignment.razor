@@ -1,0 +1,142 @@
+﻿@page "/edit-assignment/{assignmentId?}"
+
+@inject NavigationManager NavigationManager
+@inject IEditAssignment EditAssignmentUseCase
+@inject IGetAssignmentById GetAssignmentByIdUseCase
+
+@if (assignment != null)
+{
+    <h3>@assignment.Description</h3>
+    <br />
+
+    <EditForm Model="@assignment" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <InputText id="description" @bind-Value="assignment.Description" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="format">Format</label>
+            <InputText id="format" @bind-Value="assignment.Format" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="paper-type">Paper type</label>
+            <InputText id="paper-type" @bind-Value="assignment.PaperType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="machine-type">Machine type</label>
+            <InputText id="machine-type" @bind-Value="assignment.MachineType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="binding-type">Binding type</label>
+            <InputText id="binding-type" @bind-Value="assignment.BindingType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-additional">Additional</label>
+            <InputText id="book-additional" @bind-Value="assignment.BookAdditional" class="form-control"></InputText>
+        </div>
+
+        <br />
+        <h4>Book cover</h4>
+        <hr />
+
+        <div class="form-group">
+            <label for="book-cover">Type of press</label>
+            <InputText id="book-cover" @bind-Value="assignment.BookCover" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-cover-paper-type">Paper type</label>
+            <InputText id="book-cover-paper-type" @bind-Value="assignment.BookCoverPaperType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-cover-plastic-type">Type of plastic</label>
+            <InputText id="book-cover-plastic-type" @bind-Value="assignment.BookCoverPlasticType" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="book-cover-additional">Additional</label>
+            <InputText id="book-cover-additional" @bind-Value="assignment.BookCoverAdditional" class="form-control"></InputText>
+        </div>
+        <br />
+        <br />
+        <hr />
+        <div>
+            <button type="submit" class="btn btn-dark">Save</button>
+        </div>
+        <br />
+        <br />
+        <div>
+            <button type="button" class="btn btn-dark" @onclick="OnCancel">Cancel</button>
+        </div>
+        <br />
+        <br />
+
+    </EditForm>
+}
+<br />
+<br />
+
+@code {
+    [Parameter]
+    public String? assignmentId { get; set; }
+    private Assignment? assignment;
+    private Assignment? working;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()// tu poslije override je bio async pa ako ima problema mozda je u tome
+    {
+        base.OnParametersSet();
+
+        if (int.TryParse(this.assignmentId, out int iAssignmentId))
+        {
+            this.working = GetAssignmentByIdUseCase.Execute(iAssignmentId);
+            if (working != null)
+            {
+                this.assignment = new Assignment
+                    {
+                        Id = working.Id,
+                        Format = working.Format,
+                        PaperType = working.PaperType,
+                        MachineType = working.MachineType,
+                        Description = working.Description,
+                        BookCover = working.BookCover,
+                        BookCoverPaperType = working.BookCoverPaperType,
+                        BookCoverPlasticType = working.BookCoverPlasticType,
+                        BookCoverAdditional = working.BookCoverAdditional,
+                        BookAdditional = working.BookAdditional,
+                        BindingType = working.BindingType
+                    };
+            }
+        }
+    }
+
+
+    private void HandleValidSubmit()
+    {
+        if (this.assignment != null)
+        {
+            Assignment submitAssignment = this.assignment;
+            EditAssignmentUseCase.Execute(submitAssignment);
+        }
+        NavigationManager.NavigateTo("/assignments");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/assignments");
+    }
+}
+

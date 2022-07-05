@@ -1,0 +1,83 @@
+﻿@inject IViewCategories ViewCategoriesUseCase
+@inject IGetJobsBycategoryIdAndIsTaken GetJobsByCategoryIdAndIsTakenUseCase
+@inject IGetCategoryById GetCategoryByIdUseCase
+@inject IGetCategoriesMinimalId GetCategoriesMinimalIdUseCase
+
+<h4>Select Category</h4>
+<br/>
+
+<div class="form-group">
+    <label for="category-id">Category</label>
+    <select id="category-id" @bind="SelectedCategoryId" class="form-control">
+        <option selected></option>
+        @foreach (var cat in categories)
+        {
+            <option value="@cat.Id" >@cat.Name</option>
+        }
+    </select>
+</div>
+
+<br/>
+
+@if (jobsInCategory != null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Job name</th>
+                <th>Taken</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in jobsInCategory)
+            {
+                <tr @onclick="@(() => OnSelectJob(item))" style="cursor:pointer">
+                    <td>@item.Name</td>
+                    <td>@item.IsTaken</td> <!--todo mozda da ovdje stavim da ili ne ovisno je ili nije uzet-->
+                    <td><!--<button type="button" @onclick="@(() => OnSelectJob(item))" class="btn btn-primary">Select</button> Mozda tu staviti nesto kao Is it done i onda da ide na onu za done job--></td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Job> jobsInCategory;
+
+    [Parameter]
+    public EventCallback<Job> OnJobSelect{ get; set; }
+
+    private int selectedCategoryId;
+    private int SelectedCategoryId
+    {
+        get
+        {
+            return selectedCategoryId;
+        }
+        set
+        {
+            selectedCategoryId = value;
+            jobsInCategory = GetJobsByCategoryIdAndIsTakenUseCase.Execute(value, false);
+            StateHasChanged();
+        }
+    }
+    private IEnumerable<Category> categories;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        int minimalIdCategoryId = GetCategoriesMinimalIdUseCase.Execute();
+        jobsInCategory = GetJobsByCategoryIdAndIsTakenUseCase.Execute(minimalIdCategoryId, false);
+        categories = ViewCategoriesUseCase.Execute();
+    }
+
+    private void OnSelectJob(Job job)
+    {
+        if (job != null)
+        {
+            OnJobSelect.InvokeAsync(job);
+        }
+    }
+}

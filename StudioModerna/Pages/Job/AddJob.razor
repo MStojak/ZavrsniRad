@@ -1,0 +1,90 @@
+﻿@page "/add-job"
+
+@inject NavigationManager NavigationManager
+@inject IViewCategories ViewCategoriesUseCase
+@inject IViewAllSuppliers ViewSupplierUseCase
+@inject IAddJob AddJobUseCase
+
+<h3>Add Job</h3>
+<br/>
+
+@if(job != null)
+{
+    <EditForm Model="@job" OnValidSubmit="@HandleValidSubmit">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="form-group">
+            <label for="name">Name</label>
+            <InputText id="name" @bind-Value="job.Name" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="category-id">Category</label>
+            <select id="category-id" @bind="job.CategoryId" class="form-control">
+                <option selected></option>
+                @foreach (var cat in categories)
+               {
+                   <option value="@cat.Id">@cat.Name</option>
+               }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="supplier-id">Supplier</label>
+            <select id="supplier-id" @bind="job.SupplierId" class="form-control">
+                <option selected></option>
+                @foreach (var sup in suppliers)
+               {
+                   <option value="@sup.Id">@sup.Name</option>
+               }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="deadline">Deadline</label>
+            <InputDate id="deadline" @bind-Value="job.Deadline" class="form-control"></InputDate>
+        </div>
+
+        <div class="form-group">
+            <label for="location">Location</label>
+            <InputText id="location" @bind-Value="job.Location" class="form-control"></InputText>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <InputText id="description" @bind-Value="job.Description" class="form-control"></InputText>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-primary" @onclick="OnCancel">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    private Job job;
+    private IEnumerable<Category> categories;
+    private IEnumerable<Supplier> suppliers;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        job = new Job();
+        categories = ViewCategoriesUseCase.Execute();
+        suppliers = ViewSupplierUseCase.Execute();
+    }
+
+    private void HandleValidSubmit()
+    {
+        job.IsTaken = false;
+        job.IsDone = false;
+        AddJobUseCase.Execute(job);
+        NavigationManager.NavigateTo("/jobs");
+    }
+
+    private void OnCancel()
+    {
+        NavigationManager.NavigateTo("/jobs");
+    }
+}
