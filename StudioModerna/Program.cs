@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+
 using Plugins.Data.InMemory;
 using StudioModerna;
 using UseCases.DataPluginInterfaces;
@@ -12,7 +13,7 @@ using UseCases.Clients;
 using UseCases.WorkOrders;
 using UseCases.OutputDatas;
 using Plugins.Data.SQL;
-using Microsoft.EntityFrameworkCore.SqlServer;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -21,7 +22,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddDbContext<CompanyContext>(options =>
 {
-   //options.UseS(Configuration.)
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
 //dependency injection for in memory data store

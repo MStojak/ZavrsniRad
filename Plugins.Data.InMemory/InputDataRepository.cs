@@ -22,8 +22,6 @@ namespace Plugins.Data.InMemory
         }
         public void Add(InputData inputData)
         {
-            if (inputDatas.Any(x => x.NameOfAGood.Equals(inputData.NameOfAGood, StringComparison.OrdinalIgnoreCase)))
-                return;
             var id = -1;
             if (inputDatas.Count != 0)
                 id = inputDatas.Max(x => x.Id);
